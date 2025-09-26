@@ -31,7 +31,7 @@ def main(args):
     image_name = file_info['name']
 
     dsa_handler = DSAHandler(
-        girderApiUrl=args.girderApiUlr
+        girderApiUrl=args.girderApiUrl
     )
     annotations = dsa_handler.get_annotations(
         item = image_id
@@ -39,7 +39,7 @@ def main(args):
 
     ann_names = [i['properties']['name'] for i in annotations]
     base_annotation = annotations[ann_names.index(args.base_annotation)]
-    agg_annotations = [annotations[ann_names.index(i)] for i in args.agg_annotations.split(',') if i in ann_names]
+    agg_annotations = [annotations[ann_names.index(i)] for i in args.agg_annotation.split(',') if i in ann_names]
 
     for ann in agg_annotations:
         agged_annotation = spatially_aggregate(ann,[base_annotation],separate=False,summarize=False)
@@ -55,7 +55,17 @@ def main(args):
 
         with open(os.getcwd()+f'/{ann["properties"]["name"]}.json','r') as f:
             formatted_anns = json.load(f)
-            f.close()
+        
+        # === Fix formatting issues ===
+        for el in formatted_anns[0]["annotation"]["elements"]:
+            # Fix points structure (unwrap + drop stray 0)
+            if isinstance(el.get("points"), list) and len(el["points"]) == 1 and isinstance(el["points"][0], list):
+                flat_points = [p for p in el["points"][0] if isinstance(p, list)]
+                el["points"] = flat_points
+ 
+            # Remove bad 'type' inside user
+            if "user" in el and "type" in el["user"]:
+                del el["user"]["type"]
 
         gc.post(
             f'/annotation/item/{image_id}?token={args.girderToken}',
@@ -65,11 +75,7 @@ def main(args):
                 'Content-Type': 'application/json'
             }
         )
-
-    
-
+        print(f'Uploaded aggregated annotation {ann["properties"]["name"]} to DSA')
 
 if __name__=='__main__':
     main(CLIArgumentParser().parse_args())
-
-

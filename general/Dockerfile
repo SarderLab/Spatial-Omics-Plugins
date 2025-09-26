@@ -16,7 +16,7 @@ RUN apt-get update && \
     graphviz \
     unzip \
     libhdf5-dev \
-    software-properties-common \
+    # software-properties-common \
     libssl-dev \
     # Standard build tools \
     build-essential \
