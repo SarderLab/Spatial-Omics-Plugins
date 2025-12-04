@@ -66,6 +66,15 @@ def main(args):
             # Remove bad 'type' inside user
             if "user" in el and "type" in el["user"]:
                 del el["user"]["type"]
+            
+            # Extract Condition from Condition_Aggregated (NEW CODE)
+            if "user" in el:
+                condition_data = el["user"].get("Condition_Aggregated", {}).get("Count", {})
+                if condition_data:
+                    # Extract the first key (e.g., "AKI")
+                    condition = list(condition_data.keys())[0]
+                    # Add it as a simple string field
+                    el["user"]["Condition"] = condition
 
         gc.post(
             f'/annotation/item/{image_id}?token={args.girderToken}',
