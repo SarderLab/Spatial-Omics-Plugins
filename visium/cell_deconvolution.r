@@ -15,16 +15,17 @@ read_data_formats <- function(input_file_path){
     file_extension <- file_ext(input_file_path)
     print(input_file_path)
     print(file_extension)
-    if (tolower(file_extension) == "rds"){
+    if (!is.na(file_extension)){
+      if (tolower(file_extension) == "rds"){
         read_file <- readRDS(input_file_path)
-    } else if (tolower(file_extension) == "h5"){
+      } else if (tolower(file_extension) == "h5"){
         read_file <- Read10X_h5(input_file_path)
         read_file <- CreateSeuratObject(counts = read_file)
-    } else if (tolower(file_extension) == "h5ad"){
+      } else if (tolower(file_extension) == "h5ad"){
         read_file <- LoadH5Seurat(input_file_path)
+      }
+      return(read_file)  
     }
-
-    return(read_file)
 }
 
 # Function for running STdeconvolve
@@ -39,7 +40,7 @@ RunSTDeconvolve <- function(read_input_file){
     ## choose optimal number of cell-types
     ldsas <- fitLDA(t(as.matrix(corpus)),Ks=seq(2,9,by=1))
     ## getting best model results
-    optLDA <- optimalModel(models=ldas,opt="min")
+    optLDA <- optimalModel(models=ldsas,opt="min")
     ## extract deconvolved cell-type proportions (theta) and transcriptional profiles (beta)
     results <- getBetaTheta(optLDA,perc.filt = 0.05, betaScale = 1000)
     deconProp <- results$theta
@@ -54,11 +55,10 @@ RunSTDeconvolve <- function(read_input_file){
 }
 
 # Function for integration using KPMP atlas
-integrate_kpmp_atlas <- function(spatial){
+integrate_kpmp_atlas <- function(spatial, atlas_path){
     DefaultAssay(spatial) <- "SCT"
     
-    atlas_path <- "KidneyAtlas_snCV3_20percent.h5Seurat"
-    kpmp_atlas <- LoadH5Seurat(atlas_path, assays = c("counts","scale.data"),tools = TRUE,images=False)
+    kpmp_atlas <- LoadH5Seurat(atlas_path, assays = c("counts","scale.data"),tools = TRUE, images=FALSE)
 
     Idents(kpmp_atlas) <- kpmp_atlas@meta.data$subclass.l2
 
@@ -124,25 +124,24 @@ integrate_kpmp_atlas <- function(spatial){
 
 # General function for getting deconvolution results
 get_cell_deconvolution <- function(input_file, organ_key){
-
     # Reading input file
     read_input_file <- read_data_formats(input_file)
     file_extension <- file_ext(input_file)
-
-    if (organ_key == "kidneykpmp"){
+    if (!is.na(organ_key)) {
+      if (organ_key == "kidneykpmp"){
         print("Using KPMP Reference")
         integrated_spatial_data <- integrate_kpmp_atlas(read_input_file)
-    } else if (organ_key =="st_deconvolve"){
+      } else if (organ_key =="st_deconvolve"){
         print("Using STdeconvolve")
         integrated_spatial_data <- RunSTDeconvolve(read_input_file)
-    } else {
+      } else {
         integrated_spatial_data <- RunAzimuth(read_input_file,organ_key)
+      }
+      
+      output_path <- str_replace(input_file,paste(".",file_extension,sep=""),'_integrated.rds')
+      saveRDS(integrated_spatial_data,output_path)  
     }
-
-    output_path <- str_replace(input_file,paste(".",file_extension,sep=""),'_integrated.rds')
-    saveRDS(integrated_spatial_data,output_path)
 }
-
 
 arg_list <- commandArgs(trailingOnly=TRUE)
 print(arg_list)

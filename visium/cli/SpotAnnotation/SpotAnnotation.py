@@ -59,10 +59,10 @@ def main(args):
     )
     
     # Extracting integration and spot coordinates info
-    #extract_spot_info(f'./{file_info["name"]}', INTEGRATION_DATA_KEYS)
+    # extract_spot_info(f'./{file_info["name"]}', INTEGRATION_DATA_KEYS)
     # Sanitizing file name
     file_name_path = f"{os.getcwd()}/{file_info['name']}"
-    subprocess.call(['Rscript', '../../extract_rds_dataframes.r', file_name_path,*INTEGRATION_DATA_KEYS])
+    subprocess.call(['Rscript', '../../extract_rds_dataframes.r', file_name_path, *INTEGRATION_DATA_KEYS])
 
     if not args.spot_coords is None:
         spot_coords_file_info = gc.get(f'/file/{args.spot_coords}')
@@ -100,7 +100,7 @@ def main(args):
             output_csvs = [i for i in os.listdir(os.getcwd()+'/') if 'csv' in i and not i=='spot_coordinates.csv']
             print(f'Updated Output CSV files: {output_csvs}')
 
-        if not args.gene_list_file is None:
+        if args.gene_list_file is not None:
             try:
                 gene_list_file_info = gc.get(f'/file/{args.gene_list_file}')
                 print(f'Grabbing specific list of genes from: {gene_list_file_info["name"]}')
@@ -120,27 +120,30 @@ def main(args):
         # Adding properties from other output csv files
         for o in output_csvs:
             property_list = pd.read_csv(o).to_dict('records')
-            for s,p in zip(visium_spots['features'],property_list):
+            for s,p in zip(visium_spots['features'], property_list):
                 s['properties'] = s['properties'] | p
         
         # If a scalefactors_json.json is present
-        if not args.scale_factors is None:
-            scale_factors_file_info = gc.get(f'/file/{args.scale_factors}')
-            gc.downloadFile(
-                args.scale_factors,
-                path = f'{os.getcwd()}/{scale_factors_file_info["name"]}'
-            )
+        if args.scale_factors is not None:
+            try:
+                scale_factors_file_info = gc.get(f'/file/{args.scale_factors}')
+                gc.downloadFile(
+                    args.scale_factors,
+                    path = f'{os.getcwd()}/{scale_factors_file_info["name"]}'
+                )
 
-            with open(f'{os.getcwd()}/{scale_factors_file_info["name"]}','r') as f:
-                scale_factors = json.load(f)
-                f.close()
-            
-            if 'tissue_hires_scalef' in scale_factors:
-                scale_val = scale_factors['tissue_hires_scalef']
-            elif 'hires' in scale_factors:
-                scale_val = scale_factors['hires']
+                with open(f'{os.getcwd()}/{scale_factors_file_info["name"]}','r') as f:
+                    scale_factors = json.load(f)
+                    f.close()
+                
+                if 'tissue_hires_scalef' in scale_factors:
+                    scale_val = scale_factors['tissue_hires_scalef']
+                elif 'hires' in scale_factors:
+                    scale_val = scale_factors['hires']
 
-            visium_spots = geojson.utils.map_geometries(lambda g: geojson.utils.map_tuples(lambda c: (c[0]*scale_val,c[1]*scale_val),g),visium_spots)
+                visium_spots = geojson.utils.map_geometries(lambda g: geojson.utils.map_tuples(lambda c: (c[0]*scale_val,c[1]*scale_val),g),visium_spots)
+            except girder_client.HttpError:
+                print('No scale_factors file provided')
 
         # Converting to histomics format just to add a "name"
         histomics_spots = geojson_to_histomics(visium_spots)

@@ -26,23 +26,9 @@
       <index>1</index>
     </image>
   </parameters>
-  <parameters advanced="true">
-    <label>Girder API URL and Key</label>
-    <description>A Girder API URL and token for Girder client</description>
-    <string>
-      <name>girderApiUrl</name>
-      <longflag>api-url</longflag>
-      <label>Girder API URL</label>
-      <description>A Girder API URL (e.g., https://girder.example.com:443/api/v1)</description>
-      <default></default>
-    </string>
-    <string>
-      <name>girderToken</name>
-      <longflag>token</longflag>
-      <label>Girder API Token</label>
-      <description>A Girder token</description>
-      <default></default>
-    </string>
+  <parameters>
+    <label>Spot Annotation Parameters</label>
+    <description>Parameters for spot annotation generation.</description>
     <boolean>
       <name>use_gene_selection</name>
       <longflag>use-gene-selection</longflag>
@@ -87,5 +73,23 @@
       <label>Spot Coordinates File</label>
       <description>If you have a separate file that contains spot coordinates, include that here</description>
     </file>
+  </parameters>
+  <parameters advanced="true">
+    <label>Girder API URL and Key</label>
+    <description>A Girder API URL and token for Girder client</description>
+    <string>
+      <name>girderApiUrl</name>
+      <longflag>api-url</longflag>
+      <label>Girder API URL</label>
+      <description>A Girder API URL (e.g., https://girder.example.com:443/api/v1)</description>
+      <default></default>
+    </string>
+    <string>
+      <name>girderToken</name>
+      <longflag>token</longflag>
+      <label>Girder API Token</label>
+      <description>A Girder token</description>
+      <default></default>
+    </string>
   </parameters>
 </executable>
