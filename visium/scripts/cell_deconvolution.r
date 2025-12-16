@@ -89,7 +89,7 @@ integrate_kpmp_atlas <- function(spatial, atlas_path){
     max_pred$score <- max_pred_val
     max_pred$Barcode <- rownames(max_pred)
 
-    spatial@meta.data.subclass.l2 <- max_pred$Seurat_subset
+    spatial@meta.data$subclass.l2 <- max_pred$Seurat_subset
     spatial@meta.data$subclass.l2_score <- max_pred$score
 
     Idents(kpmp_atlas) <- kpmp_atlas@meta.data[["subclass.l1"]]

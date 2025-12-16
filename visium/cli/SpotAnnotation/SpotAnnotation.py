@@ -1,25 +1,16 @@
 """Codes for generating spot annotations and posting them to an item
 """
-
 import os
-import sys
 
 import pandas as pd
 import json
 import geojson
+import girder_client
+import subprocess
 
 from ctk_cli import CLIArgumentParser
-import girder_client
-import numpy as np
-
-from shapely.geometry import Point
-import uuid
-
-#import rpy2.robjects as robjects
-import subprocess
-from typing_extensions import Union
-
 from fusion_tools.utils.shapes import load_visium, geojson_to_histomics
+from visium.utils.spot_aggregation import process_sample_to_spot_json
 
 # Make sure these don't have spaces
 INTEGRATION_DATA_KEYS = [
@@ -59,10 +50,8 @@ def main(args):
     )
     
     # Extracting integration and spot coordinates info
-    # extract_spot_info(f'./{file_info["name"]}', INTEGRATION_DATA_KEYS)
-    # Sanitizing file name
     file_name_path = f"{os.getcwd()}/{file_info['name']}"
-    subprocess.call(['Rscript', '../../extract_rds_dataframes.r', file_name_path, *INTEGRATION_DATA_KEYS])
+    subprocess.call(['Rscript', '../../utils/extract_rds_dataframes.r', file_name_path, *INTEGRATION_DATA_KEYS])
 
     if not args.spot_coords is None:
         spot_coords_file_info = gc.get(f'/file/{args.spot_coords}')
@@ -71,7 +60,6 @@ def main(args):
             args.spot_coords,
             path = f'{os.getcwd()}/spot_coordinates.csv'
         )
-
 
     # Finding all output csv files
     output_csvs = [i for i in os.listdir(os.getcwd()+'/') if 'csv' in i and not i=='spot_coordinates.csv']
@@ -96,7 +84,7 @@ def main(args):
         # Checking for gene_list_file or gene_selection_method
         if args.use_gene_selection:
             print(f'Using gene selection method: {args.gene_selection_method}, {args.n} selected')
-            subprocess.call(['Rscript', '../../gene_selection_csv.r', file_name_path,args.gene_selection_method,str(args.n)])
+            subprocess.call(['Rscript', '../../utils/gene_selection_csv.r', file_name_path,args.gene_selection_method,str(args.n)])
             output_csvs = [i for i in os.listdir(os.getcwd()+'/') if 'csv' in i and not i=='spot_coordinates.csv']
             print(f'Updated Output CSV files: {output_csvs}')
 
@@ -111,18 +99,39 @@ def main(args):
                     path = f'{os.getcwd()}/{gene_list_file_info["name"]}'
                 )
 
-                subprocess.call(['Rscript', '../../gene_selection_csv.r', file_name_path,"specific_list",f'{os.getcwd()}/{gene_list_file_info["name"]}'])
+                subprocess.call(['Rscript', '../../utils/gene_selection_csv.r', file_name_path,"specific_list",f'{os.getcwd()}/{gene_list_file_info["name"]}'])
                 output_csvs = [i for i in os.listdir(os.getcwd()+'/') if 'csv' in i and not i=='spot_coordinates.csv']
                 print(f'Updated Output CSV files: {output_csvs}')
             except girder_client.HttpError:
                 print('No gene_list_file provided')
 
+        if not args.cell_reference_file is None:
+            cell_reference_file_info = gc.get(f'/file/{args.cell_reference_file}')
+            cell_reference_path = f'{os.getcwd()}/cell_reference.csv'
+            # Downloading cell reference file to cwd
+            gc.downloadFile(
+                args.cell_reference_file,
+                path = cell_reference_path
+            )
+            print(f'Using cell reference file at: {cell_reference_path}')
+        else:
+            cell_reference_path = '../../public/cell_reference.csv'
+            print(f'Using default cell reference file at: {cell_reference_path}')
+
         # Adding properties from other output csv files
         for o in output_csvs:
-            property_list = pd.read_csv(o).to_dict('records')
-            for s,p in zip(visium_spots['features'], property_list):
-                s['properties'] = s['properties'] | p
-        
+            if o in ['predsubclassl1.csv', 'pred_subclass_l1.csv']:
+                l1_celltype_path = o
+            if o in ['predsubclassl2.csv', 'pred_subclass_l2.csv']:
+                l2_celltype_path = o
+
+        visium_spots = process_sample_to_spot_json(
+            visium_spots,
+            l1_celltype_path,
+            l2_celltype_path,
+            cell_reference_path
+        )
+
         # If a scalefactors_json.json is present
         if args.scale_factors is not None:
             try:

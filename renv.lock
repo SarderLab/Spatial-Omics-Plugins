@@ -3,26 +3,6 @@
     "Version": "4.3.3",
     "Repositories": [
       {
-        "Name": "BioCsoft",
-        "URL": "https://bioconductor.org/packages/3.18/bioc"
-      },
-      {
-        "Name": "BioCann",
-        "URL": "https://bioconductor.org/packages/3.18/data/annotation"
-      },
-      {
-        "Name": "BioCexp",
-        "URL": "https://bioconductor.org/packages/3.18/data/experiment"
-      },
-      {
-        "Name": "BioCworkflows",
-        "URL": "https://bioconductor.org/packages/3.18/workflows"
-      },
-      {
-        "Name": "BioCbooks",
-        "URL": "https://bioconductor.org/packages/3.18/books"
-      },
-      {
         "Name": "CRAN",
         "URL": "https://cloud.r-project.org"
       }
@@ -2738,7 +2718,7 @@
     },
     "SeuratObject": {
       "Package": "SeuratObject",
-      "Version": "5.2.0",
+      "Version": "5.3.0",
       "Source": "Repository",
       "Title": "Data Structures for Single Cell Data",
       "Authors@R": "c( person(given = 'Paul', family = 'Hoffman', email = 'hoff0792@alumni.umn.edu', role = 'aut', comment = c(ORCID = '0000-0002-7693-8957')), person(given = 'Rahul', family = 'Satija', email = 'seurat@nygenome.org', role = c('aut', 'cre'), comment = c(ORCID = '0000-0001-9448-8833')), person(given = 'David', family = 'Collins', email = 'dcollins@nygenome.org', role = 'aut', comment = c(ORCID = '0000-0001-9243-7821')), person(given = \"Yuhan\", family = \"Hao\", email = 'yhao@nygenome.org', role = 'aut', comment = c(ORCID = '0000-0002-1810-0822')), person(given = \"Austin\", family = \"Hartman\", email = 'ahartman@nygenome.org', role = 'aut', comment = c(ORCID = '0000-0001-7278-1852')), person(given = \"Gesmira\", family = \"Molla\", email = 'gmolla@nygenome.org', role = 'aut', comment = c(ORCID = '0000-0002-8628-5056')), person(given = 'Andrew', family = 'Butler', email = 'abutler@nygenome.org', role = 'aut', comment = c(ORCID = '0000-0003-3608-0463')), person(given = 'Tim', family = 'Stuart', email = 'tstuart@nygenome.org', role = 'aut', comment = c(ORCID = '0000-0002-3044-0897')), person(given = \"Madeline\", family = \"Kowalski\", email = \"mkowalski@nygenome.org\", role = \"ctb\", comment = c(ORCID = \"0000-0002-5655-7620\")), person(given = \"Saket\", family = \"Choudhary\", email = \"schoudhary@nygenome.org\", role = \"ctb\", comment = c(ORCID = \"0000-0001-5202-7633\")), person(given = \"Skylar\", family = \"Li\", email = \"sli@nygenome.org\", role = \"ctb\"), person(given = \"Longda\", family = \"Jiang\", email = \"ljiang@nygenome.org\", role = \"ctb\", comment = c(ORCID = \"0000-0003-4964-6497\")), person(given = \"Anagha\", family = \"Shenoy\", email = \"ashenoy@nygenome.org\", role = \"ctb\", comment = c(ORCID = \"0000-0002-0537-6862\")), person(given = 'Jeff', family = 'Farrell', email = 'jfarrell@g.harvard.edu', role = 'ctb'), person(given = 'Shiwei', family = 'Zheng', email = 'szheng@nygenome.org', role = 'ctb', comment = c(ORCID = '0000-0001-6682-6743')), person(given = 'Christoph', family = 'Hafemeister', email = 'chafemeister@nygenome.org', role = 'ctb', comment = c(ORCID = '0000-0001-6365-8254')), person(given = 'Patrick', family = 'Roelli', email = 'proelli@nygenome.org', role = 'ctb') )",
@@ -2786,7 +2766,7 @@
       "BuildManual": "true",
       "Encoding": "UTF-8",
       "LazyData": "true",
-      "RoxygenNote": "7.3.2",
+      "RoxygenNote": "7.3.3",
       "Collate": "'RcppExports.R' 'zzz.R' 'generics.R' 'keymixin.R' 'graph.R' 'default.R' 'assay.R' 'logmap.R' 'layers.R' 'assay5.R' 'centroids.R' 'command.R' 'compliance.R' 'data.R' 'jackstraw.R' 'dimreduc.R' 'segmentation.R' 'molecules.R' 'spatial.R' 'fov.R' 'neighbor.R' 'seurat.R' 'sparse.R' 'utils.R'",
       "NeedsCompilation": "yes",
       "Author": "Paul Hoffman [aut] (ORCID: <https://orcid.org/0000-0002-7693-8957>), Rahul Satija [aut, cre] (ORCID: <https://orcid.org/0000-0001-9448-8833>), David Collins [aut] (ORCID: <https://orcid.org/0000-0001-9243-7821>), Yuhan Hao [aut] (ORCID: <https://orcid.org/0000-0002-1810-0822>), Austin Hartman [aut] (ORCID: <https://orcid.org/0000-0001-7278-1852>), Gesmira Molla [aut] (ORCID: <https://orcid.org/0000-0002-8628-5056>), Andrew Butler [aut] (ORCID: <https://orcid.org/0000-0003-3608-0463>), Tim Stuart [aut] (ORCID: <https://orcid.org/0000-0002-3044-0897>), Madeline Kowalski [ctb] (ORCID: <https://orcid.org/0000-0002-5655-7620>), Saket Choudhary [ctb] (ORCID: <https://orcid.org/0000-0001-5202-7633>), Skylar Li [ctb], Longda Jiang [ctb] (ORCID: <https://orcid.org/0000-0003-4964-6497>), Anagha Shenoy [ctb] (ORCID: <https://orcid.org/0000-0002-0537-6862>), Jeff Farrell [ctb], Shiwei Zheng [ctb] (ORCID: <https://orcid.org/0000-0001-6682-6743>), Christoph Hafemeister [ctb] (ORCID: <https://orcid.org/0000-0001-6365-8254>), Patrick Roelli [ctb]",
@@ -10137,10 +10117,10 @@
     },
     "tm": {
       "Package": "tm",
-      "Version": "0.7-16",
+      "Version": "0.7-17",
       "Source": "Repository",
       "Title": "Text Mining Package",
-      "Date": "2025-02-19",
+      "Date": "2025-12-10",
       "Authors@R": "c(person(\"Ingo\", \"Feinerer\", role = \"aut\", email = \"feinerer@logic.at\", comment = c(ORCID = \"0000-0001-7656-8338\")), person(\"Kurt\", \"Hornik\", role = c(\"aut\", \"cre\"), email = \"Kurt.Hornik@R-project.org\", comment = c(ORCID = \"0000-0003-4198-9911\")), person(\"Artifex Software, Inc.\", role = c(\"ctb\", \"cph\"), comment = \"pdf_info.ps taken from GPL Ghostscript\"))",
       "Depends": [
         "R (>= 3.4.0)",
@@ -10177,7 +10157,7 @@
       "URL": "https://tm.r-forge.r-project.org/",
       "Additional_repositories": "https://datacube.wu.ac.at",
       "NeedsCompilation": "yes",
-      "Author": "Ingo Feinerer [aut] (<https://orcid.org/0000-0001-7656-8338>), Kurt Hornik [aut, cre] (<https://orcid.org/0000-0003-4198-9911>), Artifex Software, Inc. [ctb, cph] (pdf_info.ps taken from GPL Ghostscript)",
+      "Author": "Ingo Feinerer [aut] (ORCID: <https://orcid.org/0000-0001-7656-8338>), Kurt Hornik [aut, cre] (ORCID: <https://orcid.org/0000-0003-4198-9911>), Artifex Software, Inc. [ctb, cph] (pdf_info.ps taken from GPL Ghostscript)",
       "Maintainer": "Kurt Hornik <Kurt.Hornik@R-project.org>",
       "Repository": "CRAN"
     },
@@ -10721,22 +10701,28 @@
     },
     "yaml": {
       "Package": "yaml",
-      "Version": "2.3.11",
+      "Version": "2.3.12",
       "Source": "Repository",
       "Type": "Package",
       "Title": "Methods to Convert R Data to YAML and Back",
-      "Date": "2025-11-06",
-      "Suggests": [
-        "RUnit"
-      ],
-      "Authors@R": "c( person(\"Shawn\",    \"Garbett\",  role = c(\"cre\",\"ctb\"), email   = \"shawn.garbett@vumc.org\", comment = c(ORCID=\"0000-0003-4079-5621\") ), person(\"Jeremy\",  \"Stephens\", role = c(\"aut\", \"ctb\")), person(\"Kirill\",  \"Simonov\",  role = \"aut\"), person(\"Yihui\",   \"Xie\",      role = \"ctb\", comment = c(ORCID=\"0000-0003-0645-5666\")), person(\"Zhuoer\",  \"Dong\",     role = \"ctb\"), person(\"Hadley\",  \"Wickham\",  role = \"ctb\", comment = c(ORCID=\"0000-0003-4757-117X\")), person(\"Jeffrey\", \"Horner\",   role = \"ctb\"), person(\"reikoch\",             role = \"ctb\"), person(\"Will\",    \"Beasley\",  role = \"ctb\", comment = c(ORCID=\"0000-0002-5613-5006\")), person(\"Brendan\", \"O'Connor\", role = \"ctb\"), person(\"Michael\", \"Quinn\",    role = \"ctb\"), person(\"Charlie\", \"Gao\",      role = \"ctb\"), person(c(\"Gregory\", \"R.\"), \"Warnes\", role = \"ctb\"), person(c(\"Zhian\", \"N.\"),   \"Kamvar\", role = \"ctb\") )",
-      "Maintainer": "Shawn Garbett <shawn.garbett@vumc.org>",
-      "License": "BSD_3_clause + file LICENSE",
+      "Authors@R": "c( person(\"Hadley\", \"Wickham\", , \"hadley@posit.co\", role = \"cre\", comment = c(ORCID = \"0000-0003-4757-117X\")), person(\"Shawn\", \"Garbett\", , \"shawn.garbett@vumc.org\", role = \"ctb\", comment = c(ORCID = \"0000-0003-4079-5621\")), person(\"Jeremy\", \"Stephens\", role = c(\"aut\", \"ctb\")), person(\"Kirill\", \"Simonov\", role = \"aut\"), person(\"Yihui\", \"Xie\", role = \"ctb\", comment = c(ORCID = \"0000-0003-0645-5666\")), person(\"Zhuoer\", \"Dong\", role = \"ctb\"), person(\"Jeffrey\", \"Horner\", role = \"ctb\"), person(\"reikoch\", role = \"ctb\"), person(\"Will\", \"Beasley\", role = \"ctb\", comment = c(ORCID = \"0000-0002-5613-5006\")), person(\"Brendan\", \"O'Connor\", role = \"ctb\"), person(\"Michael\", \"Quinn\", role = \"ctb\"), person(\"Charlie\", \"Gao\", role = \"ctb\"), person(c(\"Gregory\", \"R.\"), \"Warnes\", role = \"ctb\"), person(c(\"Zhian\", \"N.\"), \"Kamvar\", role = \"ctb\") )",
       "Description": "Implements the 'libyaml' 'YAML' 1.1 parser and emitter (<https://pyyaml.org/wiki/LibYAML>) for R.",
-      "URL": "https://github.com/vubiostat/r-yaml/",
-      "BugReports": "https://github.com/vubiostat/r-yaml/issues",
+      "License": "BSD_3_clause + file LICENSE",
+      "URL": "https://yaml.r-lib.org, https://github.com/r-lib/yaml/",
+      "BugReports": "https://github.com/r-lib/yaml/issues",
+      "Suggests": [
+        "knitr",
+        "rmarkdown",
+        "testthat (>= 3.0.0)"
+      ],
+      "Config/testthat/edition": "3",
+      "Config/Needs/website": "tidyverse/tidytemplate",
+      "Encoding": "UTF-8",
+      "RoxygenNote": "7.3.3",
+      "VignetteBuilder": "knitr",
       "NeedsCompilation": "yes",
-      "Author": "Shawn Garbett [cre, ctb] (ORCID: <https://orcid.org/0000-0003-4079-5621>), Jeremy Stephens [aut, ctb], Kirill Simonov [aut], Yihui Xie [ctb] (ORCID: <https://orcid.org/0000-0003-0645-5666>), Zhuoer Dong [ctb], Hadley Wickham [ctb] (ORCID: <https://orcid.org/0000-0003-4757-117X>), Jeffrey Horner [ctb], reikoch [ctb], Will Beasley [ctb] (ORCID: <https://orcid.org/0000-0002-5613-5006>), Brendan O'Connor [ctb], Michael Quinn [ctb], Charlie Gao [ctb], Gregory R. Warnes [ctb], Zhian N. Kamvar [ctb]",
+      "Author": "Hadley Wickham [cre] (ORCID: <https://orcid.org/0000-0003-4757-117X>), Shawn Garbett [ctb] (ORCID: <https://orcid.org/0000-0003-4079-5621>), Jeremy Stephens [aut, ctb], Kirill Simonov [aut], Yihui Xie [ctb] (ORCID: <https://orcid.org/0000-0003-0645-5666>), Zhuoer Dong [ctb], Jeffrey Horner [ctb], reikoch [ctb], Will Beasley [ctb] (ORCID: <https://orcid.org/0000-0002-5613-5006>), Brendan O'Connor [ctb], Michael Quinn [ctb], Charlie Gao [ctb], Gregory R. Warnes [ctb], Zhian N. Kamvar [ctb]",
+      "Maintainer": "Hadley Wickham <hadley@posit.co>",
       "Repository": "CRAN"
     },
     "yulab.utils": {

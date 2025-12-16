@@ -76,13 +76,8 @@ def main(args):
         print(os.listdir(os.getcwd()+'/'))
 
         print(f'Running cell deconvolution for: {args.organ}')
-        #integrator = robjects.globalenv['integrate_spatial']
-        #integrator(
-        #    file_info['name'],
-        #    ORGAN_REF_KEY[args.organ]
-        #)
 
-        subprocess.call(['Rscript', '../../cell_deconvolution.r', '"'+file_info['name']+'"','"'+ORGAN_REF_KEY[args.organ]+'"'])
+        subprocess.call(['Rscript', '../../utils/cell_deconvolution.r', '"'+file_info['name']+'"','"'+ORGAN_REF_KEY[args.organ]+'"'])
 
         print(os.listdir(os.getcwd()+'/'))
 

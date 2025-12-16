@@ -1,0 +1,17 @@
+Main_Types,Sub_Types,Cell_States,Structure,Class
+PT,PT.PT-S1.PT-S2.PT-S3.aPT.cycPT.dPT.dPT/DTL,reference.reference.reference.reference.altered.cycling.degenerative.degenerative,tubules,epithelial
+DTL,DTL.DTL1.DTL2.DTL3.dDTL3,reference.reference.reference.reference.degenerative,tubules,epithelial
+ATL,ATL.dATL,reference.degenerative,tubules,epithelial
+TAL,TAL.aTAL1.aTAL2.M-TAL.dM-TAL.C-TAL.dC-TAL.MD,reference.altered.altered.reference.degenerative.reference.degenerative.reference,tubules,epithelial
+DCT,DCT.DCT1.DCT2.dDCT.cycDCT,reference.reference.reference.degenerative.cycling,tubules,epithelial
+CNT,CNT.CNT-PC.dCNT.cycCNT,reference.reference.degenerative.cycling,tubules,epithelial
+PC,PC.C-PC.CCD-PC.OMCD-PC.M-PC.dOMCD-PC.dM-PC.IMCD.dIMCD,reference.reference.reference.reference.reference.degenerative.degenerative.reference.degenerative,tubules,epithelial
+IC,IC.C-IC-A.CCD-IC-A.CNT-IC-A.dC-IC-A.OMCD-IC-A.M-IC-A.tPC-IC.IC-B,reference.reference.reference.reference.degenerative.reference.reference.transitioning.reference,tubules,epithelial
+PapE,PapE,reference,tubules,epithelial
+POD,POD.dPOD,reference.degenerative,glomeruli,epithelial
+PEC,PEC,reference,glomeruli,epithelial
+EC,EC.EC-GC.EC-AEA.EC-DVR.EC-PTC.dEC-PTC.EC-AVR.dEC.cycEC.EC-LYM,reference.reference.reference.reference.reference.degenerative.reference.degenerative.cycling.reference,vessels,endothelial
+VSM/P,VSM/P.MC.REN.VSMC.VSMC/P.dVSMC,reference.reference.reference.reference.reference.degenerative,interstitium,stroma
+FIB,FIB.MYOF.cycMYOF.M-FIB.dM-FIB.aFIB.dFIB,reference.reference.reference.reference.degenerative.altered.degenerative,interstitium,stroma
+IMM,IMM.B.PL.T.NKT.MAST.MAC-M2.cycMNP.MDC.cDC.pDC.ncMON.N,reference.reference.reference.reference.reference.reference.reference.cycling.reference.reference.reference.reference.reference,interstitium,immune
+NEU,NEU.SC/NEU,reference.reference,interstitium,neural

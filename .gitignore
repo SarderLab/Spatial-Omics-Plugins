@@ -1,10 +1,16 @@
 /phenocycler/.cellpose/*
 /phenocycler/.deepcell/*
 /visium/KidneyAtlas_snCV3_20percent.h5Seurat
+notebooks/
 logs/
 
 renv/
 .Rproj.user
+.RData
+.Rhistory
+renv.lock
+*.sh
+*.ipynb_checkpoints
 tmp/
 
 .vscode/

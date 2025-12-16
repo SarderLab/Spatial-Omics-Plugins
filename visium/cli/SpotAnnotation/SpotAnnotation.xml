@@ -29,6 +29,13 @@
   <parameters>
     <label>Spot Annotation Parameters</label>
     <description>Parameters for spot annotation generation.</description>
+    <file reference="_girder_id_">
+      <name>cell_reference_file</name>
+      <longflag>cell-reference-file</longflag>
+      <label>Cell Reference File</label>
+      <description>Reference CSV file containing Main cell types, Sub cell types, and cell states.</description>
+      <default></default>
+    </file>
     <boolean>
       <name>use_gene_selection</name>
       <longflag>use-gene-selection</longflag>
