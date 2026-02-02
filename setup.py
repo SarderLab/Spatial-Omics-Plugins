@@ -9,7 +9,7 @@ from setuptools import find_packages
 from setuptools import setup
 
 
-with open('README.rst', 'rt') as readme_file:
+with open('README.md', 'rt') as readme_file:
     readme = readme_file.read()
 
 
@@ -31,28 +31,35 @@ def prerelease_local_scheme(version):
 
 
 setup(
-    name='visium_processing',
+    name='general',
     use_scm_version={'local_scheme': prerelease_local_scheme},
-    description='Plugin for generating 10x Visium spot annotations',
+    description='Plugins for FTU Spot Aggregation and other spatial omics tasks',
     long_description=readme,
-    long_description_content_type='text/x-rst',
-    author='Sam Border',
-    author_email='samuel.border@medicine.ufl.edu',
-    url='https://github.com/SarderLab/Spatial-Omics-Plugins/general',
+    long_description_content_type='text/markdown',
+    author='Anish Tatke',
+    author_email='anish.tatke@ufl.edu',
+    url='https://github.com/SarderLab/Spatial-Omics-Plugins',
     packages=find_packages(exclude=['tests', '*_test']),
     package_dir={
-        'visium_processing': 'visium-processing',
+        'SpatialAggregation': 'SpatialAggregation',
     },
     include_package_data=True,
     install_requires=[
-        # scientific packages
+        'Pillow>=12.0.0',
+        'scikit-image>=0.25.0',
+        'scikit-learn>=1.4.0',
         'girder-slicer-cli-web',
         'girder-client',
-        'fusion-tools>=3.5.50',
         'ctk-cli',
+        'dash==3.2.0',
+        'dash-extensions>=2.0.4',
+        'wsi-annotations-kit>=1.4.9',
+        'fusion-tools[interactive]>=3.6.84',
+        'numpy>=2.3.4',
+        'tqdm>=4.66.1',
+        'rasterio>=1.3.6',
     ],
     license='Apache Software License 2.0',
-    keywords='visium_processing',
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'License :: OSI Approved :: Apache Software License',

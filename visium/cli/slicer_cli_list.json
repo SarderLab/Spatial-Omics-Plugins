@@ -1,8 +1,0 @@
-{
-    "CellDeconvolution": {
-        "type": "python"
-    },
-    "SpotAnnotation": {
-        "type": "python"
-    }
-}

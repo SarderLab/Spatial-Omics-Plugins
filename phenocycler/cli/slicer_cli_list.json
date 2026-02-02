@@ -1,8 +1,0 @@
-{
-    "RegisterImages": {
-        "type": "python"
-    },
-    "CellSegmentation": {
-        "type": "python"
-    }
-}

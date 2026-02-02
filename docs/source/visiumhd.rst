@@ -1,7 +1,0 @@
-*VIsiumHD Plugins*
-===================
-
-- In progress! 
-
-
-

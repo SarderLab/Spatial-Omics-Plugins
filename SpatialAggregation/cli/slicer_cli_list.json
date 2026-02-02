@@ -1,5 +1,5 @@
 {
-    "XeniumProcess":{
+    "Aggregate": {
         "type": "python"
     }
 }
