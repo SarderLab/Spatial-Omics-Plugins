@@ -11,9 +11,59 @@ from ctk_cli import CLIArgumentParser
 from fusion_tools.handler.dsa_handler import DSAHandler
 from fusion_tools.utils.shapes import spatially_aggregate, export_annotations
 
+def get_user_id(gc):
+    try:
+        user = gc.get("/user/me")
+        if not user:
+            token_info = gc.get("/token/current")
+            if token_info and "userId" in token_info:
+                return token_info["userId"]
+            else:
+                print("Unable to retrieve user ID from token.")
+                return None
+        return user["_id"]
+    except girder_client.HttpError as e:
+        print(f"Authentication failed: {e}")
+        return None
+    
+def get_user_info(gc, id):
+    try:
+        user = gc.get(f'/user/{id}')
+        return user
+    except girder_client.HttpError as e:
+        print(f"Failed to retrieve user info: {e}")
+        return None
+
+def get_user_running_jobs(gc, user_id):
+    try:
+        jobs = gc.get("job", parameters={
+            "userId": user_id,
+            "handlers": '["celery_handler"]',
+            "statuses": '[2]'
+        })
+        assert len(jobs) > 0, "No running jobs found for user."
+        return jobs
+    except girder_client.HttpError as e:
+        print(f"Failed to retrieve running jobs: {e}")
+        return []
+    
+def get_job(gc, title):
+    user_id = get_user_id(gc)
+    if not user_id:
+        print("No user ID found. Cannot retrieve jobs.")
+        return None, None
+    user = get_user_info(gc, user_id)
+
+    running_jobs = get_user_running_jobs(gc, user_id)    
+    for job in running_jobs:
+        if job["title"] == title:
+            return job, user['login']
+    print(f"No running jobs found with title '{title}'.")
+    return None, user['login']
+
 
 def main(args):
-
+    TITLE = 'Spatial Aggregation'
     sys.stdout.flush()
 
     # Initialize girder client
@@ -25,6 +75,11 @@ def main(args):
     print('Input arguments: ')
     for a in vars(args):
         print(f'{a}: {getattr(args,a)}')
+
+    job, user_login = get_job(gc, TITLE)
+    if job:
+        job_id = job['_id']
+        print(f"Using job ID: {job_id} for user: {user_login}")
 
     file_info = gc.get(f'/file/{args.input_image}')
     image_id = file_info['itemId']
@@ -67,24 +122,25 @@ def main(args):
             # Remove bad 'type' inside user
             if "user" in el and "type" in el["user"]:
                 del el["user"]["type"]
-            
-            # Extract Condition from Condition_Aggregated (NEW CODE)
-            if "user" in el:
-                condition_data = el["user"].get("Condition_Aggregated", {}).get("Count", {})
-                if condition_data:
-                    # Extract the first key (e.g., "AKI")
-                    condition = list(condition_data.keys())[0]
-                    # Add it as a simple string field
-                    el["user"]["Condition"] = condition
+
+        attributes = {
+            "job_id": job_id,
+            "plugin": TITLE,
+            "user": user_login if user_login else "system"
+        }
+
+        formatted_anns[0]['annotation']['attributes'] = attributes
 
         gc.post(
-            f'/annotation/item/{image_id}?token={args.girderToken}',
+            f'/annotation/item/{image_id}',
             data = json.dumps(formatted_anns),
             headers = {
                 'X-HTTP-Method':'POST',
                 'Content-Type': 'application/json'
             }
         )
+
+
         print(f'Uploaded aggregated annotation: {ann["properties"]["name"]} to DSA')
     
 
