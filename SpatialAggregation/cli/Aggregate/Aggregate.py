@@ -46,9 +46,6 @@ def main(args):
     agg_annotations = [annotations[ann_names.index(i.strip())] for i in args.agg_annotation.split(',') if i.strip() in ann_names]
 
     for ann in agg_annotations:
-        # Save original name for deletion BEFORE any modifications
-        original_ann_name = ann['properties']['name']
-
         agged_annotation = spatially_aggregate(ann,[base_annotation],separate=False,summarize=False)
 
         # Replace "/" with "_" for file saving (but keep original for deletion)
@@ -85,19 +82,43 @@ def main(args):
                     # Add it as a simple string field
                     el["user"]["Condition"] = condition
 
-        # Delete ALL existing annotations with the ORIGINAL name before uploading
-        ann_name = ann['properties']['name']  # This is the modified name (for upload)
+        # Filter out elements that don't overlap with any spots (base annotation)
+        # Elements with spot overlap will have aggregated user properties beyond just the original ones
+        original_props = set()
+        for feat in ann['features']:
+            if 'properties' in feat:
+                original_props.update(feat['properties'].keys())
+
+        for ann_doc in formatted_anns:
+            original_count = len(ann_doc["annotation"]["elements"])
+            ann_doc["annotation"]["elements"] = [
+                el for el in ann_doc["annotation"]["elements"]
+                if "user" in el and any(
+                    k not in original_props and k != "type"
+                    for k in el["user"].keys()
+                )
+            ]
+            filtered_count = len(ann_doc["annotation"]["elements"])
+            print(f'Filtered elements: {original_count} -> {filtered_count} (removed {original_count - filtered_count} without spot overlap)')
+
+        # Name the annotation as {original}_aggregated under the "AggregatedFTU" group
+        aggregated_ann_name = f'{ann["properties"]["name"]}'
+        aggregated_group = "Aggregated FTU"
+        for ann_doc in formatted_anns:
+            ann_doc["annotation"]["name"] = aggregated_ann_name
+            # Assign each element to the Aggregated FTU group
+            for el in ann_doc["annotation"]["elements"]:
+                el["group"] = aggregated_group
+
+        # Remove any previous annotation with the same aggregated name to avoid duplicates on re-runs
         existing_annotations = gc.get(f'/annotation?itemId={image_id}')
-        print(f'Found {len(existing_annotations)} existing annotations for this item')
         for existing in existing_annotations:
-            existing_name = existing['annotation'].get('name')
-            # Use original_ann_name for deletion (e.g., "arteries/arterioles")
-            if existing_name == original_ann_name:
+            if existing['annotation'].get('name') == aggregated_ann_name:
                 try:
                     gc.delete(f'/annotation/{existing["_id"]}')
-                    print(f'Deleted existing annotation: {original_ann_name} (id: {existing["_id"]})')
+                    print(f'Deleted previous annotation: {aggregated_ann_name} (id: {existing["_id"]})')
                 except Exception as e:
-                    print(f'Failed to delete annotation {original_ann_name}: {e}')
+                    print(f'Failed to delete previous {aggregated_ann_name}: {e}')
 
         gc.post(
             f'/annotation/item/{image_id}',
@@ -107,7 +128,7 @@ def main(args):
                 'Content-Type': 'application/json'
             }
         )
-        print(f'Uploaded aggregated annotation: {ann_name} to DSA')
+        print(f'Uploaded annotation "{aggregated_ann_name}" under group "{aggregated_group}" to DSA')
     
 if __name__=='__main__':
     main(CLIArgumentParser().parse_args())
