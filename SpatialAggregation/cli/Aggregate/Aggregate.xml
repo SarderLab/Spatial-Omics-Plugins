@@ -2,7 +2,7 @@
 <executable>
   <category>FUSION Plugins</category>
   <title>Spatial Aggregation</title>
-  <description>Spatially aggregate properties from one annotation to intersecting structures</description>
+  <description>Transfer properties from a base annotation layer (e.g., Spots) to spatially overlapping structures in target annotation layers (e.g., glomeruli, tubules)</description>
   <version>0.2.0</version>
   <documentation-url>https://github.com/spborder/Spatial-Omics-Plugins/</documentation-url>
   <license>Apache 2.0</license>
@@ -14,20 +14,20 @@
     <image reference="_girder_id_">
       <name>input_image</name>
       <label>Input Image</label>
-      <description>Input Filename </description>
+      <description>The whole slide image (WSI) containing the annotation layers to be processed</description>
       <channel>input</channel>
       <index>0</index>
     </image>
     <string>
       <name>base_annotation</name>
       <label>Base Annotation</label>
-      <description>Name of the annotation layer containing properties you'd like to </description>
+      <description>Name of the source annotation layer containing properties to transfer (e.g., "Spots" with spatial omics data)</description>
       <index>1</index>
     </string>
     <string>
       <name>agg_annotation</name>
       <label>Aggregation Annotation</label>
-      <description>Comma-separated list of annotation layers you'd like to receive properties from intersecting elements in "base annotation"</description>
+      <description>Comma-separated list of target annotation layers to receive aggregated properties (e.g., "glomeruli, tubules"). Existing annotations with these names will be replaced with aggregated versions</description>
       <index>2</index>
     </string>
   </parameters>
