@@ -43,7 +43,7 @@ WORKDIR $plugin_path
 RUN pip install --upgrade pip
 
 RUN pip install --upgrade --ignore-installed --no-cache-dir pip setuptools wheel && \
-    pip install . --find-links https://girder.github.io/large_image_wheels && \
+    pip install .[all] --find-links https://girder.github.io/large_image_wheels && \
     rm -rf /root/.cache/pip/*
 
 # Show what was installed

@@ -1,0 +1,8 @@
+.venv
+.git
+__pycache__
+*.pyc
+output
+test_output
+test
+*.tif
