@@ -11,7 +11,7 @@ from fusion_tools.utils.shapes import spatially_aggregate, export_annotations, l
 def run_aggregation(
     child_annotations: list,
     base_annotation: dict,
-    job_id: str,
+    job_id: str = "local",
     base_annotation_name: str = "",
     child_annotation_names: list = None,
     plugin_name: str = "Spatial Aggregation",
