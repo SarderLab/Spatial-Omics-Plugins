@@ -1,17 +1,15 @@
-"""Plugin for performing spatial aggregation from one set of annotations (aggregator) to another/others
+"""CLI entrypoint for Spatial Aggregation plugin (DSA/slicer_cli_web).
+
+This is a thin wrapper that handles Girder authentication, data fetching,
+and delegates core logic to SpatialAggregation.core.
+Kept for backward compatibility with the DSA web UI.
 """
-import os
 import sys
-import numpy as np
 import json
 
-import girder_client
-from ctk_cli import CLIArgumentParser
-
-from fusion_tools.handler.dsa_handler import DSAHandler
-from fusion_tools.utils.shapes import spatially_aggregate, export_annotations
 
 def get_user_id(gc):
+    import girder_client
     try:
         user = gc.get("/user/me")
         if not user:
@@ -25,8 +23,9 @@ def get_user_id(gc):
     except girder_client.HttpError as e:
         print(f"Authentication failed: {e}")
         return None
-    
+
 def get_user_info(gc, id):
+    import girder_client
     try:
         user = gc.get(f'/user/{id}')
         return user
@@ -35,6 +34,7 @@ def get_user_info(gc, id):
         return None
 
 def get_user_running_jobs(gc, user_id):
+    import girder_client
     try:
         jobs = gc.get("job", parameters={
             "userId": user_id,
@@ -46,7 +46,7 @@ def get_user_running_jobs(gc, user_id):
     except girder_client.HttpError as e:
         print(f"Failed to retrieve running jobs: {e}")
         return []
-    
+
 def get_job(gc, title):
     user_id = get_user_id(gc)
     if not user_id:
@@ -54,7 +54,7 @@ def get_job(gc, title):
         return None, None
     user = get_user_info(gc, user_id)
 
-    running_jobs = get_user_running_jobs(gc, user_id)    
+    running_jobs = get_user_running_jobs(gc, user_id)
     for job in running_jobs:
         if job["title"] == title:
             return job, user['login']
@@ -63,14 +63,17 @@ def get_job(gc, title):
 
 
 def main(args):
+    import girder_client
+    from fusion_tools.handler.dsa_handler import DSAHandler
+    from SpatialAggregation.core import run_aggregation
+
     TITLE = 'Spatial Aggregation'
     sys.stdout.flush()
 
     # Initialize girder client
     gc = girder_client.GirderClient(
-        apiUrl = args.girderApiUrl
+        apiUrl=args.girderApiUrl
     )
-    # Try API key auth first, fall back to session token
     try:
         gc.authenticate(apiKey=args.girderToken)
     except:
@@ -78,113 +81,64 @@ def main(args):
 
     print('Input arguments: ')
     for a in vars(args):
-        print(f'{a}: {getattr(args,a)}')
+        print(f'{a}: {getattr(args, a)}')
 
+    # Get job metadata
     job, user_login = get_job(gc, TITLE)
+    job_id = job['_id'] if job else 'unknown'
     if job:
-        job_id = job['_id']
         print(f"Using job ID: {job_id} for user: {user_login}")
 
+    # Resolve image ID from file
     file_info = gc.get(f'/file/{args.input_image}')
     image_id = file_info['itemId']
-    image_name = file_info['name']
 
-    dsa_handler = DSAHandler(
-        girderApiUrl=args.girderApiUrl
-    )
-    annotations = dsa_handler.get_annotations(
-        item = image_id
-    )
+    # Fetch annotations via DSAHandler
+    dsa_handler = DSAHandler(girderApiUrl=args.girderApiUrl)
+    annotations = dsa_handler.get_annotations(item=image_id)
 
+    # Select base and child annotations by name
     ann_names = [i['properties']['name'] for i in annotations]
     base_annotation = annotations[ann_names.index(args.base_annotation)]
-    agg_annotations = [annotations[ann_names.index(i.strip())] for i in args.agg_annotation.split(',') if i.strip() in ann_names]
+    child_names = [n.strip() for n in args.agg_annotation.split(',') if n.strip() in ann_names]
+    child_annotations = [annotations[ann_names.index(n)] for n in child_names]
 
-    for ann in agg_annotations:
-        agged_annotation = spatially_aggregate(ann,[base_annotation],separate=False,summarize=False)
+    # Run core aggregation logic
+    results = run_aggregation(
+        child_annotations=child_annotations,
+        base_annotation=base_annotation,
+        job_id=job_id,
+        base_annotation_name=args.base_annotation,
+        child_annotation_names=child_names,
+        plugin_name=TITLE,
+    )
 
-        # Replace "/" with "_" for file saving (but keep original for deletion)
-        if "/" in ann['properties']['name']:
-            ann['properties']['name'] = ann['properties']['name'].replace('/','_')
+    # Upload results to DSA
+    existing_annotations = gc.get(f'/annotation?itemId={image_id}')
+    for result in results:
+        ann_name = result["annotation"]["name"]
 
-        export_annotations(
-            agged_annotation,
-            format='histomics',
-            save_path = os.getcwd()+f'/{ann["properties"]["name"]}.json'
-        )
-
-        with open(os.getcwd()+f'/{ann["properties"]["name"]}.json','r') as f:
-            formatted_anns = json.load(f)
-            f.close()
-
-        # === Fix formatting issues ===
-        for el in formatted_anns[0]["annotation"]["elements"]:
-            # Fix points structure (unwrap + drop stray 0)
-            if isinstance(el.get("points"), list) and len(el["points"]) == 1 and isinstance(el["points"][0], list):
-                flat_points = [p for p in el["points"][0] if isinstance(p, list)]
-                el["points"] = flat_points
- 
-            # Remove bad 'type' inside user
-            if "user" in el and "type" in el["user"]:
-                del el["user"]["type"]
-
-        attributes = {
-            "job_id": job_id,
-            "plugin": TITLE,
-            "user": user_login if user_login else "system"
-        }
-
-        formatted_anns[0]['annotation']['attributes'] = attributes
-
-        # Filter out elements that don't overlap with any spots (base annotation)
-        # Elements with spot overlap will have aggregated user properties beyond just the original ones
-        original_props = set()
-        for feat in ann['features']:
-            if 'properties' in feat:
-                original_props.update(feat['properties'].keys())
-
-        for ann_doc in formatted_anns:
-            original_count = len(ann_doc["annotation"]["elements"])
-            ann_doc["annotation"]["elements"] = [
-                el for el in ann_doc["annotation"]["elements"]
-                if "user" in el and any(
-                    k not in original_props and k != "type"
-                    for k in el["user"].keys()
-                )
-            ]
-            filtered_count = len(ann_doc["annotation"]["elements"])
-            print(f'Filtered elements: {original_count} -> {filtered_count} (removed {original_count - filtered_count} without spot overlap)')
-
-        # Name the annotation as {original}_aggregated under the "AggregatedFTU" group
-        aggregated_ann_name = f'{ann["properties"]["name"]}'
-        aggregated_group = "Aggregated FTU"
-        for ann_doc in formatted_anns:
-            ann_doc["annotation"]["name"] = aggregated_ann_name
-            # Assign each element to the Aggregated FTU group
-            for el in ann_doc["annotation"]["elements"]:
-                el["group"] = aggregated_group
-
-        # Remove any previous annotation with the same aggregated name to avoid duplicates on re-runs
-        existing_annotations = gc.get(f'/annotation?itemId={image_id}')
+        # Delete existing annotations with same name
         for existing in existing_annotations:
-            if existing['annotation'].get('name') == aggregated_ann_name:
+            if existing['annotation'].get('name') == ann_name:
                 try:
                     gc.delete(f'/annotation/{existing["_id"]}')
-                    print(f'Deleted previous annotation: {aggregated_ann_name} (id: {existing["_id"]})')
+                    print(f'Deleted previous annotation: {ann_name} (id: {existing["_id"]})')
                 except Exception as e:
-                    print(f'Failed to delete previous {aggregated_ann_name}: {e}')
+                    print(f'Failed to delete previous {ann_name}: {e}')
 
+        # Upload new annotation
         gc.post(
             f'/annotation/item/{image_id}',
-            data = json.dumps(formatted_anns),
-            headers = {
-                'X-HTTP-Method':'POST',
+            data=json.dumps([result]),
+            headers={
+                'X-HTTP-Method': 'POST',
                 'Content-Type': 'application/json'
             }
         )
-        print(f'Uploaded annotation "{aggregated_ann_name}" under group "{aggregated_group}" to DSA')
-    
-if __name__=='__main__':
+        print(f'Uploaded annotation "{ann_name}" to DSA')
+
+
+if __name__ == '__main__':
+    from ctk_cli import CLIArgumentParser
     main(CLIArgumentParser().parse_args())
-
-
