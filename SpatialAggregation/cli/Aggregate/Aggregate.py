@@ -5,7 +5,6 @@ and delegates core logic to SpatialAggregation.core.
 Kept for backward compatibility with the DSA web UI.
 """
 import sys
-import json
 
 
 def get_user_id(gc):
@@ -98,6 +97,15 @@ def main(args):
     dsa_handler.gc.setToken(args.girderToken)
     annotations = dsa_handler.get_annotations(item=image_id)
 
+    # Exclude annotations that belong to the "Aggregated FTU" group (previous plugin outputs)
+    all_annotation_docs = gc.get(f'/annotation?itemId={image_id}')
+    aggregated_ftu_ids = {
+        doc['_id']
+        for doc in all_annotation_docs
+        if doc['annotation'].get('attributes', {}).get('annotation_group') == 'Aggregated FTU'
+    }
+    annotations = [a for a in annotations if a['properties'].get('_id') not in aggregated_ftu_ids]
+
     # Select base and child annotations by name
     ann_names = [i['properties']['name'] for i in annotations]
     base_annotation = annotations[ann_names.index(args.base_annotation)]
@@ -116,28 +124,23 @@ def main(args):
 
     # Upload results to DSA
     existing_annotations = gc.get(f'/annotation?itemId={image_id}')
+
+    # Delete all existing annotations in the "Aggregated FTU" group
+    for existing in existing_annotations:
+        if existing['annotation'].get('attributes', {}).get('annotation_group') == 'Aggregated FTU':
+            try:
+                gc.delete(f'/annotation/{existing["_id"]}')
+                print(f'Deleted previous annotation: {existing["annotation"].get("name")} (id: {existing["_id"]})')
+            except Exception as e:
+                print(f'Failed to delete previous annotation {existing["_id"]}: {e}')
+
     for result in results:
         ann_name = result["annotation"]["name"]
-
-        # Delete existing annotations with same name
-        for existing in existing_annotations:
-            if existing['annotation'].get('name') == ann_name:
-                try:
-                    gc.delete(f'/annotation/{existing["_id"]}')
-                    print(f'Deleted previous annotation: {ann_name} (id: {existing["_id"]})')
-                except Exception as e:
-                    print(f'Failed to delete previous {ann_name}: {e}')
-
-        # Upload new annotation
         gc.post(
             f'/annotation/item/{image_id}',
-            data=json.dumps([result]),
-            headers={
-                'X-HTTP-Method': 'POST',
-                'Content-Type': 'application/json'
-            }
+            json=result
         )
-        print(f'Uploaded annotation "{ann_name}" to DSA')
+        print(f'Uploaded annotation "{ann_name}" to DSA under "Aggregated FTU"')
 
 
 if __name__ == '__main__':

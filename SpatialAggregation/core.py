@@ -74,6 +74,7 @@ def run_aggregation(
         formatted_anns[0]["annotation"]["attributes"] = {
             "job_id": job_id,
             "plugin": plugin_name,
+            "annotation_group": annotation_group,
         }
 
         # Filter elements without spatial overlap
@@ -99,11 +100,10 @@ def run_aggregation(
                 f"(removed {original_count - filtered_count} without spot overlap)"
             )
 
-        # Set annotation name and group
-        for ann_doc in formatted_anns:
-            ann_doc["annotation"]["name"] = safe_name
-            for el in ann_doc["annotation"]["elements"]:
-                el["group"] = annotation_group
+        # Set annotation name and tag all elements with the folder group
+        formatted_anns[0]["annotation"]["name"] = ann_name
+        for el in formatted_anns[0]["annotation"]["elements"]:
+            el["group"] = annotation_group
 
         results.append(formatted_anns[0])
 
