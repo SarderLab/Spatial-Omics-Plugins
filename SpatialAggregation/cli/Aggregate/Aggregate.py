@@ -95,6 +95,7 @@ def main(args):
 
     # Fetch annotations via DSAHandler
     dsa_handler = DSAHandler(girderApiUrl=args.girderApiUrl)
+    dsa_handler.gc.setToken(args.girderToken)
     annotations = dsa_handler.get_annotations(item=image_id)
 
     # Select base and child annotations by name
